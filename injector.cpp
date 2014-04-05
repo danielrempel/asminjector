@@ -50,6 +50,7 @@ void generateCode() {
 		:
 		);
 	asm( "back: nop\n" );
+	delete (deleteptr);
 }
 
 // NULL or void*
