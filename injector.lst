@@ -1,0 +1,447 @@
+GAS LISTING build/injector.s 			page 1
+
+
+   1              		.file	"injector.cpp"
+   2              		.text
+   3              	.Ltext0:
+   4              		.section	.rodata
+   5              	.LC0:
+   6 0000 62656570 		.string	"beep-beep"
+   6      2D626565 
+   6      7000
+   7              		.text
+   8              		.globl	_Z6beeperv
+  10              	_Z6beeperv:
+  11              	.LFB2:
+  12              		.file 1 "injector.cpp"
+   1:injector.cpp  **** #include <sys/mman.h>
+   2:injector.cpp  **** #include <stdlib.h>
+   3:injector.cpp  **** #include <stdio.h>
+   4:injector.cpp  **** 
+   5:injector.cpp  **** void* mapWritableMemory(int length, void** deleteptr);
+   6:injector.cpp  **** void generateCode();
+   7:injector.cpp  **** void writeReturnSequence(void* mem);
+   8:injector.cpp  **** 
+   9:injector.cpp  **** void beeper() {
+  13              		.loc 1 9 0
+  14              		.cfi_startproc
+  15 0000 55       		pushq	%rbp
+  16              		.cfi_def_cfa_offset 16
+  17              		.cfi_offset 6, -16
+  18 0001 4889E5   		movq	%rsp, %rbp
+  19              		.cfi_def_cfa_register 6
+  10:injector.cpp  **** 	printf("beep-beep\n");
+  20              		.loc 1 10 0
+  21 0004 BF000000 		movl	$.LC0, %edi
+  21      00
+  22 0009 E8000000 		call	puts
+  22      00
+  11:injector.cpp  **** }
+  23              		.loc 1 11 0
+  24 000e 5D       		popq	%rbp
+  25              		.cfi_def_cfa 7, 8
+  26 000f C3       		ret
+  27              		.cfi_endproc
+  28              	.LFE2:
+  30              		.globl	_Z19writeReturnSequencePv
+  32              	_Z19writeReturnSequencePv:
+  33              	.LFB3:
+  12:injector.cpp  **** 
+  13:injector.cpp  **** /*
+  14:injector.cpp  **** 58			popq %rax
+  15:injector.cpp  **** FFD0		call %rax
+  16:injector.cpp  **** 
+  17:injector.cpp  **** 58			popq %rax
+  18:injector.cpp  **** FFE0		jmp %rax
+  19:injector.cpp  **** */
+  20:injector.cpp  **** void writeReturnSequence(void* mem) {
+  34              		.loc 1 20 0
+  35              		.cfi_startproc
+  36 0010 55       		pushq	%rbp
+GAS LISTING build/injector.s 			page 2
+
+
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 6, -16
+  39 0011 4889E5   		movq	%rsp, %rbp
+  40              		.cfi_def_cfa_register 6
+  41 0014 48897DE8 		movq	%rdi, -24(%rbp)
+  42              	.LBB2:
+  21:injector.cpp  **** 	char* data = (char*) mem;
+  43              		.loc 1 21 0
+  44 0018 488B45E8 		movq	-24(%rbp), %rax
+  45 001c 488945F8 		movq	%rax, -8(%rbp)
+  22:injector.cpp  **** 	data[0] = 0x58; // popq %rax
+  46              		.loc 1 22 0
+  47 0020 488B45F8 		movq	-8(%rbp), %rax
+  48 0024 C60058   		movb	$88, (%rax)
+  23:injector.cpp  **** 	data[1] = 0xff; // call %rax
+  49              		.loc 1 23 0
+  50 0027 488B45F8 		movq	-8(%rbp), %rax
+  51 002b 4883C001 		addq	$1, %rax
+  52 002f C600FF   		movb	$-1, (%rax)
+  24:injector.cpp  **** 	data[2] = 0xd0; //
+  53              		.loc 1 24 0
+  54 0032 488B45F8 		movq	-8(%rbp), %rax
+  55 0036 4883C002 		addq	$2, %rax
+  56 003a C600D0   		movb	$-48, (%rax)
+  25:injector.cpp  **** 	
+  26:injector.cpp  **** 	data[3] = 0x58; // popq %rax
+  57              		.loc 1 26 0
+  58 003d 488B45F8 		movq	-8(%rbp), %rax
+  59 0041 4883C003 		addq	$3, %rax
+  60 0045 C60058   		movb	$88, (%rax)
+  27:injector.cpp  **** 	data[4] = 0xff; // jmp %rax
+  61              		.loc 1 27 0
+  62 0048 488B45F8 		movq	-8(%rbp), %rax
+  63 004c 4883C004 		addq	$4, %rax
+  64 0050 C600FF   		movb	$-1, (%rax)
+  28:injector.cpp  **** 	data[5] = 0xe0; //
+  65              		.loc 1 28 0
+  66 0053 488B45F8 		movq	-8(%rbp), %rax
+  67 0057 4883C005 		addq	$5, %rax
+  68 005b C600E0   		movb	$-32, (%rax)
+  69              	.LBE2:
+  29:injector.cpp  **** }
+  70              		.loc 1 29 0
+  71 005e 5D       		popq	%rbp
+  72              		.cfi_def_cfa 7, 8
+  73 005f C3       		ret
+  74              		.cfi_endproc
+  75              	.LFE3:
+  77              		.section	.rodata
+  78 000a 00000000 		.align 8
+  78      0000
+  79              	.LC1:
+  80 0010 67656E65 		.string	"generateCode(): mapWritableMemory() failed"
+  80      72617465 
+  80      436F6465 
+  80      28293A20 
+  80      6D617057 
+GAS LISTING build/injector.s 			page 3
+
+
+  81              		.text
+  82              		.globl	_Z12generateCodev
+  84              	_Z12generateCodev:
+  85              	.LFB4:
+  30:injector.cpp  **** 
+  31:injector.cpp  **** void generateCode() {
+  86              		.loc 1 31 0
+  87              		.cfi_startproc
+  88              		.cfi_personality 0x3,__gxx_personality_v0
+  89              		.cfi_lsda 0x3,.LLSDA4
+  90 0060 55       		pushq	%rbp
+  91              		.cfi_def_cfa_offset 16
+  92              		.cfi_offset 6, -16
+  93 0061 4889E5   		movq	%rsp, %rbp
+  94              		.cfi_def_cfa_register 6
+  95 0064 4883EC10 		subq	$16, %rsp
+  96              	.LBB3:
+  32:injector.cpp  **** 	
+  33:injector.cpp  **** 	void* deleteptr;
+  34:injector.cpp  **** 	void* memptr = mapWritableMemory(1000, &deleteptr);
+  97              		.loc 1 34 0
+  98 0068 488D45F0 		leaq	-16(%rbp), %rax
+  99 006c 4889C6   		movq	%rax, %rsi
+ 100 006f BFE80300 		movl	$1000, %edi
+ 100      00
+ 101              	.LEHB0:
+ 102 0074 E8000000 		call	_Z17mapWritableMemoryiPPv
+ 102      00
+ 103 0079 488945F8 		movq	%rax, -8(%rbp)
+  35:injector.cpp  **** 	if(memptr == NULL) {
+ 104              		.loc 1 35 0
+ 105 007d 48837DF8 		cmpq	$0, -8(%rbp)
+ 105      00
+ 106 0082 750C     		jne	.L4
+  36:injector.cpp  **** 		printf("generateCode(): mapWritableMemory() failed\n");
+ 107              		.loc 1 36 0
+ 108 0084 BF000000 		movl	$.LC1, %edi
+ 108      00
+ 109 0089 E8000000 		call	puts
+ 109      00
+ 110              	.LEHE0:
+  37:injector.cpp  **** 		return;
+ 111              		.loc 1 37 0
+ 112 008e EB28     		jmp	.L3
+ 113              	.L4:
+  38:injector.cpp  **** 	}
+  39:injector.cpp  **** 	
+  40:injector.cpp  **** 	writeReturnSequence(memptr);
+ 114              		.loc 1 40 0
+ 115 0090 488B45F8 		movq	-8(%rbp), %rax
+ 116 0094 4889C7   		movq	%rax, %rdi
+ 117 0097 E8000000 		call	_Z19writeReturnSequencePv
+ 117      00
+  41:injector.cpp  **** 	asm( "pushq $back\n" );
+ 118              		.loc 1 41 0
+ 119              	#APP
+ 120              	# 41 "injector.cpp" 1
+GAS LISTING build/injector.s 			page 4
+
+
+  42              		asm( "pushq %0\n"
+  43              			:
+  44:injector.cpp  **** 		:"r"(&beeper)
+  45:injector.cpp  **** 		:
+  46:injector.cpp  **** 		);
+ 121              		pushq $back
+ 122              	
+ 123              	# 0 "" 2
+ 124              		.loc 1 46 0
+ 125              	#NO_APP
+ 126 00a1 B8000000 		movl	$_Z6beeperv, %eax
+ 126      00
+ 127              	#APP
+ 128              	# 46 "injector.cpp" 1
+  47              		asm( "jmp %0\n"
+  48              			:
+  49:injector.cpp  **** 		:"r"(memptr)
+  50:injector.cpp  **** 		:
+  51:injector.cpp  **** 		);
+ 129              		pushq %rax
+ 130              	
+ 131              	# 0 "" 2
+ 132              		.loc 1 51 0
+ 133              	#NO_APP
+ 134 00a7 488B45F8 		movq	-8(%rbp), %rax
+ 135              	#APP
+ 136              	# 51 "injector.cpp" 1
+  52              		asm( "back: nop\n" );
+  53              	}
+  52:injector.cpp  **** }
+ 137              		jmp %rax
+ 138              	
+ 139              	# 0 "" 2
+ 140              		.loc 1 52 0
+ 141              	# 52 "injector.cpp" 1
+  54              	
+ 142              		back: nop
+ 143              	
+ 144              	# 0 "" 2
+ 145              	#NO_APP
+ 146 00ae EB08     		jmp	.L3
+ 147              	.L7:
+ 148 00b0 4889C7   		movq	%rax, %rdi
+ 149              	.LEHB1:
+ 150 00b3 E8000000 		call	_Unwind_Resume
+ 150      00
+ 151              	.LEHE1:
+ 152              	.L3:
+ 153              	.LBE3:
+  53:injector.cpp  **** 
+ 154              		.loc 1 53 0
+ 155 00b8 C9       		leave
+ 156              		.cfi_def_cfa 7, 8
+ 157 00b9 C3       		ret
+ 158              		.cfi_endproc
+ 159              	.LFE4:
+ 160              		.globl	__gxx_personality_v0
+GAS LISTING build/injector.s 			page 5
+
+
+ 161              		.section	.gcc_except_table,"a",@progbits
+ 162              	.LLSDA4:
+ 163 0000 FF       		.byte	0xff
+ 164 0001 FF       		.byte	0xff
+ 165 0002 01       		.byte	0x1
+ 166 0003 08       		.uleb128 .LLSDACSE4-.LLSDACSB4
+ 167              	.LLSDACSB4:
+ 168 0004 14       		.uleb128 .LEHB0-.LFB4
+ 169 0005 1A       		.uleb128 .LEHE0-.LEHB0
+ 170 0006 50       		.uleb128 .L7-.LFB4
+ 171 0007 00       		.uleb128 0
+ 172 0008 53       		.uleb128 .LEHB1-.LFB4
+ 173 0009 05       		.uleb128 .LEHE1-.LEHB1
+ 174 000a 00       		.uleb128 0
+ 175 000b 00       		.uleb128 0
+ 176              	.LLSDACSE4:
+ 177              		.text
+ 179              		.section	.rodata
+ 180 003b 00000000 		.align 8
+ 180      00
+ 181              	.LC2:
+ 182 0040 6D617057 		.string	"mapWritableMemory(): Meow! Got no mem!"
+ 182      72697461 
+ 182      626C654D 
+ 182      656D6F72 
+ 182      7928293A 
+ 183              		.text
+ 184              		.globl	_Z17mapWritableMemoryiPPv
+ 186              	_Z17mapWritableMemoryiPPv:
+ 187              	.LFB5:
+  55:injector.cpp  **** // NULL or void*
+  56:injector.cpp  **** void* mapWritableMemory(int length, void** deleteptr) {
+ 188              		.loc 1 56 0
+ 189              		.cfi_startproc
+ 190 00ba 55       		pushq	%rbp
+ 191              		.cfi_def_cfa_offset 16
+ 192              		.cfi_offset 6, -16
+ 193 00bb 4889E5   		movq	%rsp, %rbp
+ 194              		.cfi_def_cfa_register 6
+ 195 00be 4883EC30 		subq	$48, %rsp
+ 196 00c2 897DDC   		movl	%edi, -36(%rbp)
+ 197 00c5 488975D0 		movq	%rsi, -48(%rbp)
+ 198              	.LBB4:
+  57:injector.cpp  **** 	
+  58:injector.cpp  **** 	void* memptr = malloc(4096*2 + length);
+ 199              		.loc 1 58 0
+ 200 00c9 8B45DC   		movl	-36(%rbp), %eax
+ 201 00cc 05002000 		addl	$8192, %eax
+ 201      00
+ 202 00d1 4898     		cltq
+ 203 00d3 4889C7   		movq	%rax, %rdi
+ 204 00d6 E8000000 		call	malloc
+ 204      00
+ 205 00db 488945F0 		movq	%rax, -16(%rbp)
+  59:injector.cpp  **** 	if(memptr == NULL) {
+ 206              		.loc 1 59 0
+ 207 00df 48837DF0 		cmpq	$0, -16(%rbp)
+GAS LISTING build/injector.s 			page 6
+
+
+ 207      00
+ 208 00e4 7511     		jne	.L9
+  60:injector.cpp  **** 		printf("mapWritableMemory(): Meow! Got no mem!\n");
+ 209              		.loc 1 60 0
+ 210 00e6 BF000000 		movl	$.LC2, %edi
+ 210      00
+ 211 00eb E8000000 		call	puts
+ 211      00
+  61:injector.cpp  **** 		return NULL;
+ 212              		.loc 1 61 0
+ 213 00f0 B8000000 		movl	$0, %eax
+ 213      00
+ 214 00f5 EB75     		jmp	.L10
+ 215              	.L9:
+  62:injector.cpp  **** 	}
+  63:injector.cpp  **** 	
+  64:injector.cpp  **** 	*deleteptr = memptr;
+ 216              		.loc 1 64 0
+ 217 00f7 488B45D0 		movq	-48(%rbp), %rax
+ 218 00fb 488B55F0 		movq	-16(%rbp), %rdx
+ 219 00ff 488910   		movq	%rdx, (%rax)
+  65:injector.cpp  **** 	
+  66:injector.cpp  **** 	unsigned long shift = -1;
+ 220              		.loc 1 66 0
+ 221 0102 48C745F8 		movq	$-1, -8(%rbp)
+ 221      FFFFFFFF 
+ 222              	.L11:
+  67:injector.cpp  **** 	int result;
+  68:injector.cpp  **** 	do {
+  69:injector.cpp  **** 		++shift;
+ 223              		.loc 1 69 0 discriminator 1
+ 224 010a 488345F8 		addq	$1, -8(%rbp)
+ 224      01
+  70:injector.cpp  **** 	}
+  71:injector.cpp  **** 	while ( (result = mprotect ( (void*) ( memptr+shift ), length, PROT_READ|PROT_WRITE|PROT_EXEC ) ) 
+ 225              		.loc 1 71 0 discriminator 1
+ 226 010f 8B45DC   		movl	-36(%rbp), %eax
+ 227 0112 4898     		cltq
+ 228 0114 488B55F8 		movq	-8(%rbp), %rdx
+ 229 0118 488B4DF0 		movq	-16(%rbp), %rcx
+ 230 011c 4801D1   		addq	%rdx, %rcx
+  68:injector.cpp  **** 		++shift;
+ 231              		.loc 1 68 0 discriminator 1
+ 232 011f BA070000 		movl	$7, %edx
+ 232      00
+ 233 0124 4889C6   		movq	%rax, %rsi
+ 234 0127 4889CF   		movq	%rcx, %rdi
+ 235 012a E8000000 		call	mprotect
+ 235      00
+ 236 012f 8945EC   		movl	%eax, -20(%rbp)
+ 237 0132 837DECFF 		cmpl	$-1, -20(%rbp)
+ 238 0136 0F94C0   		sete	%al
+ 239 0139 84C0     		testb	%al, %al
+ 240 013b 75CD     		jne	.L11
+  72:injector.cpp  **** 	if(result == 0) {
+ 241              		.loc 1 72 0
+ 242 013d 837DEC00 		cmpl	$0, -20(%rbp)
+GAS LISTING build/injector.s 			page 7
+
+
+ 243 0141 750D     		jne	.L12
+  73:injector.cpp  **** 		return (void*)(memptr+shift);
+ 244              		.loc 1 73 0
+ 245 0143 488B45F8 		movq	-8(%rbp), %rax
+ 246 0147 488B55F0 		movq	-16(%rbp), %rdx
+ 247 014b 4801D0   		addq	%rdx, %rax
+ 248 014e EB1C     		jmp	.L10
+ 249              	.L12:
+  74:injector.cpp  **** 	}
+  75:injector.cpp  **** 	else {
+  76:injector.cpp  **** 		free(memptr);
+ 250              		.loc 1 76 0
+ 251 0150 488B45F0 		movq	-16(%rbp), %rax
+ 252 0154 4889C7   		movq	%rax, %rdi
+ 253 0157 E8000000 		call	free
+ 253      00
+  77:injector.cpp  **** 		*deleteptr = 0;
+ 254              		.loc 1 77 0
+ 255 015c 488B45D0 		movq	-48(%rbp), %rax
+ 256 0160 48C70000 		movq	$0, (%rax)
+ 256      000000
+  78:injector.cpp  **** 		return NULL;
+ 257              		.loc 1 78 0
+ 258 0167 B8000000 		movl	$0, %eax
+ 258      00
+ 259              	.L10:
+ 260              	.LBE4:
+  79:injector.cpp  **** 	}
+  80:injector.cpp  **** 	
+  81:injector.cpp  **** }
+ 261              		.loc 1 81 0
+ 262 016c C9       		leave
+ 263              		.cfi_def_cfa 7, 8
+ 264 016d C3       		ret
+ 265              		.cfi_endproc
+ 266              	.LFE5:
+ 268              		.globl	main
+ 270              	main:
+ 271              	.LFB6:
+  82:injector.cpp  **** 
+  83:injector.cpp  **** int main() {
+ 272              		.loc 1 83 0
+ 273              		.cfi_startproc
+ 274 016e 55       		pushq	%rbp
+ 275              		.cfi_def_cfa_offset 16
+ 276              		.cfi_offset 6, -16
+ 277 016f 4889E5   		movq	%rsp, %rbp
+ 278              		.cfi_def_cfa_register 6
+  84:injector.cpp  **** 	generateCode();
+ 279              		.loc 1 84 0
+ 280 0172 E8000000 		call	_Z12generateCodev
+ 280      00
+  85:injector.cpp  **** }
+ 281              		.loc 1 85 0
+ 282 0177 B8000000 		movl	$0, %eax
+ 282      00
+ 283 017c 5D       		popq	%rbp
+GAS LISTING build/injector.s 			page 8
+
+
+ 284              		.cfi_def_cfa 7, 8
+ 285 017d C3       		ret
+ 286              		.cfi_endproc
+ 287              	.LFE6:
+ 289              	.Letext0:
+GAS LISTING build/injector.s 			page 9
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 injector.cpp
+    build/injector.s:10     .text:0000000000000000 _Z6beeperv
+    build/injector.s:32     .text:0000000000000010 _Z19writeReturnSequencePv
+    build/injector.s:84     .text:0000000000000060 _Z12generateCodev
+    build/injector.s:186    .text:00000000000000ba _Z17mapWritableMemoryiPPv
+        injector.cpp:52     .text:00000000000000ad back
+    build/injector.s:270    .text:000000000000016e main
+
+UNDEFINED SYMBOLS
+puts
+__gxx_personality_v0
+_Unwind_Resume
+malloc
+mprotect
+free
