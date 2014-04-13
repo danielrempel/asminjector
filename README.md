@@ -5,7 +5,8 @@ Method creates about 8192 + length bytes memory, changes access rights to +rwx o
 Arguments:  
 * length - count bytes to prepare  
 * deleteptr - pointer to voidptr, receives address of the whole mapped memory area (not only executable area) or NULL on error  
-Return value:  
+  
+Return value: 
 * address of the first of length bytes of executable memory or NULL on error  
   
 Mapped memory must be free()-d by hand, using deleteptr, not return value!  
